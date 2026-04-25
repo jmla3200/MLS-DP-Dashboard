@@ -1,0 +1,468 @@
+
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+.dash { background: #0a1628; min-height: 100vh; color: white; padding: 0; }
+.header { background: #0f1f3a; border-bottom: 1px solid #1e3a5f; padding: 20px 28px; display: flex; align-items: center; justify-content: space-between; }
+.logo { width: 44px; height: 44px; background: white; border-radius: 6px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.header-left { display: flex; align-items: center; gap: 14px; }
+.main { padding: 24px 28px; }
+.stat-grid { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 16px; margin-bottom: 24px; }
+.stat-card { background: #0f1f3a; border: 1px solid #1e3a5f; border-radius: 10px; padding: 20px; }
+.stat-label { font-size: 12px; color: #9ca3af; display: flex; align-items: center; gap: 6px; margin-bottom: 8px; }
+.stat-val { font-size: 32px; font-weight: 500; margin-bottom: 4px; }
+.stat-sub { font-size: 11px; color: #6b7280; }
+.panel { background: #0f1f3a; border: 1px solid #1e3a5f; border-radius: 10px; padding: 20px; margin-bottom: 24px; }
+.panel-title { font-size: 18px; font-weight: 500; margin-bottom: 4px; }
+.panel-sub { font-size: 12px; color: #9ca3af; }
+.panel-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 14px; gap: 12px; }
+.filter-select { background: #1e3a5f; color: white; border: 1px solid #2a4a6f; border-radius: 6px; padding: 6px 10px; font-size: 12px; outline: none; }
+.legend { display: flex; gap: 18px; margin-bottom: 12px; flex-wrap: wrap; }
+.leg-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: #9ca3af; }
+.leg-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.info-box { background: #0a1628; border: 1px solid #1e3a5f; border-radius: 8px; padding: 14px; margin-bottom: 16px; font-size: 12px; color: #d1d5db; line-height: 1.6; }
+.bottom-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 24px; margin-bottom: 24px; }
+.insight-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 24px; margin-bottom: 24px; }
+.insight-card { background: #0f1f3a; border-radius: 10px; padding: 20px; display: flex; gap: 14px; }
+.insight-icon { width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.insight-title { font-size: 13px; font-weight: 500; margin-bottom: 6px; }
+.insight-text { font-size: 12px; color: #d1d5db; line-height: 1.6; }
+table { width: 100%; border-collapse: collapse; font-size: 12px; }
+th { text-align: left; color: #9ca3af; padding-bottom: 10px; font-weight: 400; position: sticky; top: 0; background: #0f1f3a; }
+th.r { text-align: right; } th.c { text-align: center; }
+td { padding: 10px 0; border-top: 1px solid #1e3a5f; color: white; vertical-align: middle; }
+td.r { text-align: right; } td.c { text-align: center; } td.muted { color: #9ca3af; }
+.eff-bar { width: 8px; height: 28px; border-radius: 3px; display: inline-block; }
+.search-wrap { position: relative; }
+.search-wrap input { padding: 7px 10px 7px 30px; background: #1e3a5f; color: white; border: 1px solid #2a4a6f; border-radius: 8px; font-size: 12px; outline: none; width: 200px; }
+.search-icon { position: absolute; left: 9px; top: 50%; transform: translateY(-50%); color: #6b7280; }
+.count-badge { background: rgba(255,255,255,0.05); border-radius: 6px; padding: 4px 10px; font-size: 11px; color: #9ca3af; }
+.table-controls { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; }
+.tt { position: fixed; background: #0a1628; border: 1px solid #1e3a5f; border-radius: 8px; padding: 12px 14px; pointer-events: none; display: none; z-index: 999; font-size: 12px; min-width: 190px; line-height: 1.7; }
+.tt-player { font-size: 13px; font-weight: 500; margin-bottom: 2px; }
+.tt-team { color: #9ca3af; margin-bottom: 8px; font-size: 11px; }
+.tt-row { display: flex; justify-content: space-between; gap: 16px; }
+.tt-label { color: #9ca3af; }
+.tt-val { font-weight: 500; }
+.tt-cat { margin-top: 6px; font-size: 11px; font-weight: 500; }
+</style>
+
+<div class="dash">
+<div class="header">
+  <div class="header-left">
+    <div class="logo">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0a1628" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg>
+    </div>
+    <div>
+      <div style="font-size:15px;font-weight:500;">MLS Designated Player Efficiency Dashboard</div>
+      <div style="font-size:12px;color:#9ca3af;">Analyzing the cost and on-field performance of Designated Players</div>
+    </div>
+  </div>
+  <div style="text-align:right;">
+    <div style="font-size:11px;color:#9ca3af;">Last Updated</div>
+    <div style="font-size:13px;">April 22, 2026</div>
+  </div>
+</div>
+
+<div class="main">
+  <div class="stat-grid">
+    <div class="stat-card">
+      <div class="stat-label"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2" stroke-linecap="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg> Total DP Spend</div>
+      <div class="stat-val" id="total-spend">—</div>
+      <div class="stat-sub" id="player-count-sub">—</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="22" y1="12" x2="18" y2="12"/><line x1="6" y1="12" x2="2" y2="12"/><line x1="12" y1="6" x2="12" y2="2"/><line x1="12" y1="22" x2="12" y2="18"/></svg> Avg Cost per G+A</div>
+      <div class="stat-val" id="avg-cost">—</div>
+      <div class="stat-sub">Average efficiency</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg> Total DP Goals + Assists</div>
+      <div class="stat-val" id="total-ga">—</div>
+      <div class="stat-sub" id="ga-breakdown">—</div>
+    </div>
+  </div>
+
+  <!-- Scatter 1: Salary vs G+A with regression -->
+  <div class="panel">
+    <div class="panel-header">
+      <div>
+        <div class="panel-title">Salary vs. Goals + Assists Contributions</div>
+        <div class="panel-sub">Higher spending does not always lead to higher goal output</div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;flex-shrink:0;">
+        <select class="filter-select" id="filter1" onchange="renderScatter1()">
+          <option value="All">All Performance</option>
+          <option value="Overperformed">Overperformed</option>
+          <option value="On Curve">On Curve</option>
+          <option value="Underperformed">Underperformed</option>
+        </select>
+        <div style="background:#1e3a5f;border-radius:6px;padding:6px 10px;font-size:12px;display:flex;align-items:center;gap:6px;">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          2025
+        </div>
+      </div>
+    </div>
+    <div class="info-box"><span style="color:white;font-weight:500;">Performance Measurement:</span> Player performance is evaluated by comparing actual G+A contributions against expected contributions based on salary. Players who exceed expectations significantly are <span style="color:#10b981;">Overperformed</span>, those who fall short are <span style="color:#ef4444;">Underperformed</span>, and those within range are <span style="color:#3b82f6;">On Curve</span>.</div>
+    <div class="legend">
+      <div class="leg-item"><div class="leg-dot" style="background:#10b981;"></div> Overperformed</div>
+      <div class="leg-item"><div class="leg-dot" style="background:#3b82f6;"></div> On Curve</div>
+      <div class="leg-item"><div class="leg-dot" style="background:#ef4444;"></div> Underperformed</div>
+      <div class="leg-item" style="gap:8px;"><div style="width:24px;height:3px;background:#ffffff;border-radius:2px;"></div><span>Regression line</span></div>
+    </div>
+    <div style="height:380px;position:relative;">
+      <canvas id="scatter1" role="img" aria-label="Scatter chart of guaranteed compensation vs goals and assists contribution with regression line">MLS designated player salary vs goals and assists data with regression line.</canvas>
+    </div>
+  </div>
+
+  <!-- Bottom grid -->
+  <div class="bottom-grid">
+    <div class="panel">
+      <div class="panel-title" style="margin-bottom:16px;font-size:15px;">Top Spending Teams on Designated Players</div>
+      <div style="position:relative;width:100%;height:380px;">
+        <canvas id="teamBar" role="img" aria-label="Horizontal bar chart of top 10 MLS teams by DP spending">Top 10 MLS teams by designated player spending.</canvas>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="table-controls">
+        <div class="panel-title" style="font-size:15px;">Cost Efficiency by Player</div>
+        <div style="flex:1;"></div>
+        <div class="search-wrap">
+          <svg class="search-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" id="player-search" placeholder="Search players or teams..." oninput="renderTable()">
+        </div>
+        <div class="count-badge" id="player-count-badge">—</div>
+      </div>
+      <div style="overflow-y:auto;max-height:360px;">
+        <table>
+          <thead>
+            <tr>
+              <th>Player</th><th>Team</th>
+              <th class="r">Salary ($M)</th>
+              <th class="c">G+A</th>
+              <th class="r">Cost/G+A</th>
+            </tr>
+          </thead>
+          <tbody id="table-body"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Insight cards -->
+  <div class="insight-grid">
+    <div class="insight-card" style="border:1px solid rgba(59,130,246,0.3);">
+      <div class="insight-icon" style="background:#1d4ed8;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+      </div>
+      <div>
+        <div class="insight-title">Key Insight:</div>
+        <div class="insight-text">There is a weak correlation between salary investment and goal output among Designated Players. Several high-earning players follow uniform output relative to their cost, while some lower-paid players deliver exceptional value with higher goal contributions per dollar spent.</div>
+      </div>
+    </div>
+    <div class="insight-card" style="border:1px solid rgba(234,88,12,0.3);">
+      <div class="insight-icon" style="background:#c2410c;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="22" y1="12" x2="18" y2="12"/><line x1="6" y1="12" x2="2" y2="12"/><line x1="12" y1="6" x2="12" y2="2"/><line x1="12" y1="22" x2="12" y2="18"/></svg>
+      </div>
+      <div>
+        <div class="insight-title">Methodology Note:</div>
+        <div class="insight-text">These metrics favor attacking players (forwards and attacking midfielders) as they focus on goals and assists. However, most clubs strategically allocate their Designated Player spots to these positions, making this analysis particularly relevant for evaluating DP value and investment efficiency.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scatter 2: Cost per G+A vs Compensation with regression -->
+  <div class="panel">
+    <div class="panel-header">
+      <div>
+        <div class="panel-title">Player Cost per Goal + Assist Contribution vs. Guaranteed Compensation</div>
+        <div class="panel-sub">Lower cost per G+A = more efficient use of DP salary</div>
+      </div>
+      <select class="filter-select" id="filter2" onchange="renderScatter2()">
+        <option value="All">All Performance</option>
+        <option value="Overperformed (Efficient)">Overperformed (Efficient)</option>
+        <option value="On Curve (Expected Cost)">On Curve (Expected Cost)</option>
+        <option value="Underperformed (Inefficient)">Underperformed (Inefficient)</option>
+      </select>
+    </div>
+    <div class="info-box">
+      This plot focuses on efficiency. Players are categorized based on whether their cost per contribution is below (more efficient), around (expected efficiency), or above (less efficient) a median or threshold value. This highlights players who provide their contributions at a lower cost, regardless of their total compensation, by normalizing their output against their salary.
+    </div>
+    <div class="legend">
+      <div class="leg-item"><div class="leg-dot" style="background:#10b981;"></div> Overperformed (Efficient)</div>
+      <div class="leg-item"><div class="leg-dot" style="background:#3b82f6;"></div> On Curve (Expected Cost)</div>
+      <div class="leg-item"><div class="leg-dot" style="background:#ef4444;"></div> Underperformed (Inefficient)</div>
+      <div class="leg-item" style="gap:8px;"><div style="width:24px;height:3px;background:#ffffff;border-radius:2px;"></div><span>Regression line</span></div>
+    </div>
+    <div style="height:460px;position:relative;">
+      <canvas id="scatter2" role="img" aria-label="Scatter chart of guaranteed compensation vs cost per goal plus assist contribution with regression line">MLS designated player salary vs cost per G+A with regression line.</canvas>
+    </div>
+  </div>
+
+</div>
+
+<div class="tt" id="tt">
+  <div class="tt-player" id="tt-player"></div>
+  <div class="tt-team" id="tt-team"></div>
+  <div class="tt-row"><span class="tt-label">Salary</span><span class="tt-val" id="tt-salary"></span></div>
+  <div class="tt-row"><span class="tt-label">Goals</span><span class="tt-val" id="tt-goals"></span></div>
+  <div class="tt-row"><span class="tt-label">Assists</span><span class="tt-val" id="tt-assists"></span></div>
+  <div class="tt-row"><span class="tt-label">G+A</span><span class="tt-val" id="tt-ga"></span></div>
+  <div class="tt-row" id="tt-cost-row"><span class="tt-label">Cost/G+A</span><span class="tt-val" id="tt-cost"></span></div>
+  <div class="tt-cat" id="tt-cat"></div>
+</div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+const RAW = [
+["Miguel Almirón","ATL",6,4,7871000,10,"Underperformed"],
+["Aleksey Miranchuk","ATL",6,2,4885441,8,"Underperformed"],
+["Emmanuel Latte Lath","ATL",7,0,4030546,7,"Underperformed"],
+["Brandon Vázquez","ATX",5,0,3551778,5,"Underperformed"],
+["Myrto Uzuni","ATX",6,3,2225000,9,"Underperformed"],
+["Osman Bukari","ATX",3,3,1500000,6,"Underperformed"],
+["Jonathan Bamba","CHI",5,3,5581806,8,"Underperformed"],
+["Hugo Cuypers","CHI",17,2,3528044,19,"Overperformed"],
+["Evander","CIN",18,13,4736411,31,"Overperformed"],
+["Kévin Denkey","CIN",15,1,3810000,16,"Overperformed"],
+["Diego Rossi","CLB",16,3,3426827,19,"Overperformed"],
+["Dániel Gazdag","CLB",6,5,2597643,11,"Overperformed"],
+["Wessam Abou Ali","CLB",3,0,2157375,3,"Underperformed"],
+["Wilfried Zaha","CLT",10,5,2751667,15,"Overperformed"],
+["Liel Abada","CLT",5,1,2548500,6,"Underperformed"],
+["Kévin Cabral","COL",0,0,2100000,0,"Underperformed"],
+["Rafael Navarro","COL",12,3,1449600,15,"Overperformed"],
+["Christian Benteke","DCU",9,3,4937500,12,"Underperformed"],
+["Mateusz Klich","DCU",0,1,2100000,1,"Underperformed"],
+["Luciano Acosta","FCD",5,1,4296413,6,"Underperformed"],
+["Petar Musa","FCD",18,6,2680000,24,"Overperformed"],
+["Ezequiel Ponce","HOU",10,0,2852200,10,"Underperformed"],
+["Artur","HOU",1,0,893375,1,"Underperformed"],
+["Son Heung-Min","LAFC",9,2,11152852,11,"Underperformed"],
+["Dénis Bouanga","LAFC",24,7,3709500,31,"Overperformed"],
+["Riqui Puig","LAG",0,0,5779688,0,"Underperformed"],
+["Joseph Paintsil","LAG",10,2,4182000,12,"On Curve"],
+["Gabriel Pec","LAG",7,3,2459000,10,"On Curve"],
+["Lionel Messi","MIA",29,16,20446668,45,"Overperformed"],
+["Sergio Busquets","MIA",0,8,8774996,8,"Underperformed"],
+["Jordi Alba","MIA",6,11,6000000,17,"Overperformed"],
+["Kelvin Yeboah","MIN",9,0,1477200,9,"On Curve"],
+["Joaquín Pereyra","MIN",6,7,844000,13,"Overperformed"],
+["Giacomo Vrioni","MTL",3,0,2247500,3,"Underperformed"],
+["Carles Gil","NER",10,9,4702083,19,"Overperformed"],
+["Tomás Chancalay","NER",4,2,1060000,6,"Underperformed"],
+["Hany Mukhtar","NSH",16,8,5311667,24,"Overperformed"],
+["Walker Zimmerman","NSH",0,1,3456979,1,"Underperformed"],
+["Sam Surridge","NSH",24,3,3208139,27,"Overperformed"],
+["Nicolás Fernández","NYC",3,1,3650000,4,"Underperformed"],
+["Thiago Martins","NYC",1,0,2162000,1,"Underperformed"],
+["Talles Magno","NYC",0,0,1065000,0,"Underperformed"],
+["Emil Forsberg","NYRB",11,7,6035625,18,"Overperformed"],
+["Eric Maxim Choupo-Moting","NYRB",17,3,3530667,20,"Overperformed"],
+["Luis Muriel","ORL",9,5,4003333,14,"Overperformed"],
+["Marco Pašalić","ORL",12,4,1650667,16,"Overperformed"],
+["Martín Ojeda","ORL",16,9,1032600,25,"Overperformed"],
+["Mikael Uhre","PHI",6,6,2240000,12,"Overperformed"],
+["Bruno Damiani","PHI",7,1,726700,8,"Underperformed"],
+["Jonathan Rodríguez","POR",1,0,3627500,1,"Underperformed"],
+["David Da Costa","POR",4,6,3425000,10,"Underperformed"],
+["Rwan Cruz","RSL",0,1,1858426,1,"Underperformed"],
+["Diogo Gonçalves","RSL",4,4,1797108,8,"Underperformed"],
+["Hirving Lozano","SD",9,8,7633333,17,"Overperformed"],
+["Anders Dreyer","SD",19,16,2434314,35,"Overperformed"],
+["Albert Rusnák","SEA",11,7,2575000,18,"Overperformed"],
+["Jordan Morris","SEA",5,1,2260000,6,"Underperformed"],
+["Pedro de la Vega","SEA",4,3,1379000,7,"Underperformed"],
+["Cristian Arango","SJE",13,3,2216667,16,"Overperformed"],
+["Cristian Espinoza","SJE",4,8,2002000,12,"Overperformed"],
+["Hernán López","SJE",0,0,1020000,0,"Underperformed"],
+["Dejan Joveljic","SKC",18,2,3306250,20,"Overperformed"],
+["Manu García","SKC",2,5,2325313,7,"Underperformed"],
+["Marcel Hartel","STL",9,4,2183113,13,"Overperformed"],
+["João Klauss","STL",10,2,1370284,12,"Overperformed"],
+["Lorenzo Insigne","TOR",1,2,15400000,3,"Underperformed"],
+["Federico Bernardeschi","TOR",4,3,6295381,7,"Underperformed"],
+["Ryan Gauld","VAN",1,1,3675000,2,"Underperformed"],
+["Andrés Cubas","VAN",0,0,1146375,0,"Underperformed"]
+];
+
+const data = RAW.map(r => {
+  const ga = r[5], comp = r[4];
+  const costPerGA = ga > 0 ? comp / ga : null;
+  return { player:r[0], team:r[1], goals:r[2], assists:r[3], comp, ga, cat:r[6], costPerGA };
+});
+
+// Median cost per G+A for cost scatter categorization
+const validCosts = data.filter(p=>p.costPerGA!==null).map(p=>p.costPerGA).sort((a,b)=>a-b);
+const mid = Math.floor(validCosts.length/2);
+const medianCost = validCosts.length%2===0 ? (validCosts[mid-1]+validCosts[mid])/2 : validCosts[mid];
+const threshold = 100000;
+function costCat(p) {
+  if (p.costPerGA===null) return null;
+  if (p.costPerGA < medianCost-threshold) return 'Overperformed (Efficient)';
+  if (p.costPerGA > medianCost+threshold) return 'Underperformed (Inefficient)';
+  return 'On Curve (Expected Cost)';
+}
+
+const COLORS = {
+  'Overperformed':'#10b981','On Curve':'#3b82f6','Underperformed':'#ef4444',
+  'Overperformed (Efficient)':'#10b981','On Curve (Expected Cost)':'#3b82f6','Underperformed (Inefficient)':'#ef4444'
+};
+
+// Stats
+const totalComp = data.reduce((s,p)=>s+p.comp,0);
+const totalGoals = data.reduce((s,p)=>s+p.goals,0);
+const totalAssists = data.reduce((s,p)=>s+p.assists,0);
+const totalGA = totalGoals+totalAssists;
+const avgCost = totalGA>0 ? totalComp/totalGA : 0;
+document.getElementById('total-spend').textContent='$'+(totalComp/1e6).toFixed(2)+'M';
+document.getElementById('player-count-sub').textContent='Across '+data.length+' players';
+document.getElementById('avg-cost').textContent='$'+(avgCost/1000).toFixed(1)+'K';
+document.getElementById('total-ga').textContent=totalGA;
+document.getElementById('ga-breakdown').textContent=totalGoals+' goals, '+totalAssists+' assists';
+
+// Linear regression
+function linReg(pts) {
+  const n=pts.length; let sx=0,sy=0,sxy=0,sxx=0;
+  for(const p of pts){sx+=p.x;sy+=p.y;sxy+=p.x*p.y;sxx+=p.x*p.x;}
+  const slope=(n*sxy-sx*sy)/(n*sxx-sx*sx);
+  const intercept=(sy-slope*sx)/n;
+  return {slope,intercept};
+}
+
+// Tooltip
+const ttEl=document.getElementById('tt');
+function showTT(e,p,showCost) {
+  document.getElementById('tt-player').textContent=p.player;
+  document.getElementById('tt-team').textContent=p.team;
+  document.getElementById('tt-salary').textContent='$'+(p.comp/1e6).toFixed(2)+'M';
+  document.getElementById('tt-goals').textContent=p.goals;
+  document.getElementById('tt-assists').textContent=p.assists;
+  document.getElementById('tt-ga').textContent=p.ga;
+  const costRow=document.getElementById('tt-cost-row');
+  if(showCost&&p.costPerGA!==null){
+    costRow.style.display='flex';
+    document.getElementById('tt-cost').textContent=p.costPerGA>=1e6?'$'+(p.costPerGA/1e6).toFixed(2)+'M':'$'+(p.costPerGA/1000).toFixed(0)+'K';
+  } else { costRow.style.display='none'; }
+  const catLabel=showCost?costCat(p):p.cat;
+  const col=COLORS[catLabel]||'#9ca3af';
+  document.getElementById('tt-cat').textContent=catLabel||'';
+  document.getElementById('tt-cat').style.color=col;
+  ttEl.style.display='block';
+  ttEl.style.left=Math.min(e.clientX+14,window.innerWidth-210)+'px';
+  ttEl.style.top=(e.clientY-10)+'px';
+}
+function hideTT(){ttEl.style.display='none';}
+
+function makeTTPlugin(showCost){
+  return {
+    enabled:false,
+    external:({chart,tooltip})=>{
+      if(!tooltip||!tooltip.dataPoints||!tooltip.dataPoints.length){hideTT();return;}
+      const raw=tooltip.dataPoints[0].raw;
+      if(!raw||!raw.player){hideTT();return;}
+      const r=chart.canvas.getBoundingClientRect();
+      showTT({clientX:r.left+tooltip.caretX,clientY:r.top+tooltip.caretY},raw,showCost);
+    }
+  };
+}
+
+function buildRegDs(xArr, yArr) {
+  const pts=xArr.map((x,i)=>({x,y:yArr[i]}));
+  const {slope,intercept}=linReg(pts);
+  const xMin=Math.min(...xArr), xMax=Math.max(...xArr);
+  return {
+    label:'Regression line',
+    data:[{x:xMin,y:slope*xMin+intercept},{x:xMax,y:slope*xMax+intercept}],
+    type:'line',borderColor:'#ffffff',borderWidth:3,pointRadius:0,fill:false,tension:0,order:0
+  };
+}
+
+let c1,c2;
+
+function renderScatter1(){
+  const f=document.getElementById('filter1').value;
+  if(c1) c1.destroy();
+  const cats=['Overperformed','On Curve','Underperformed'];
+  const scatterDs=cats.map(cat=>{
+    const pts=data.filter(p=>f==='All'||p.cat===f).filter(p=>p.cat===cat)
+      .map(p=>({...p,x:p.comp/1e6,y:p.ga}));
+    return {label:cat,data:pts,backgroundColor:COLORS[cat]+'cc',borderColor:COLORS[cat],borderWidth:1,pointRadius:5,pointHoverRadius:7};
+  }).filter(ds=>ds.data.length>0);
+
+  const regDs=buildRegDs(data.map(p=>p.comp/1e6),data.map(p=>p.ga));
+
+  c1=new Chart(document.getElementById('scatter1'),{
+    type:'scatter',data:{datasets:[...scatterDs,regDs]},
+    options:{
+      responsive:true,maintainAspectRatio:false,animation:false,
+      plugins:{legend:{display:false},tooltip:makeTTPlugin(false)},
+      scales:{
+        x:{title:{display:true,text:'Guaranteed Compensation ($M)',color:'#9ca3af'},ticks:{color:'#6b7280',callback:v=>'$'+v.toFixed(1)+'M'},grid:{color:'#00000000'}},
+        y:{title:{display:true,text:'Goals + Assists',color:'#9ca3af'},ticks:{color:'#6b7280'},grid:{color:'#00000000'}}
+      }
+    }
+  });
+}
+
+function renderScatter2(){
+  const f=document.getElementById('filter2').value;
+  if(c2) c2.destroy();
+  const cats=['Overperformed (Efficient)','On Curve (Expected Cost)','Underperformed (Inefficient)'];
+  const validData=data.filter(p=>p.costPerGA!==null);
+  const scatterDs=cats.map(cat=>{
+    const pts=validData.filter(p=>f==='All'||costCat(p)===f).filter(p=>costCat(p)===cat)
+      .map(p=>({...p,x:p.comp,y:p.costPerGA}));
+    return {label:cat,data:pts,backgroundColor:COLORS[cat]+'cc',borderColor:COLORS[cat],borderWidth:1,pointRadius:5,pointHoverRadius:7};
+  }).filter(ds=>ds.data.length>0);
+
+  const regDs=buildRegDs(validData.map(p=>p.comp),validData.map(p=>p.costPerGA));
+
+  c2=new Chart(document.getElementById('scatter2'),{
+    type:'scatter',data:{datasets:[...scatterDs,regDs]},
+    options:{
+      responsive:true,maintainAspectRatio:false,animation:false,
+      plugins:{legend:{display:false},tooltip:makeTTPlugin(true)},
+      scales:{
+        x:{title:{display:true,text:'Guaranteed Compensation ($)',color:'#9ca3af'},ticks:{color:'#6b7280',callback:v=>v>=1e6?'$'+(v/1e6).toFixed(0)+'M':'$'+(v/1000).toFixed(0)+'K'},grid:{color:'#00000000'}},
+        y:{title:{display:true,text:'Cost per Goal + Assist Contribution ($)',color:'#9ca3af'},ticks:{color:'#6b7280',callback:v=>v>=1e6?'$'+(v/1e6).toFixed(2)+'M':'$'+(v/1000).toFixed(0)+'K'},grid:{color:'#00000000'}}
+      }
+    }
+  });
+}
+
+function renderTeamBar(){
+  const teams={};
+  data.forEach(p=>{teams[p.team]=(teams[p.team]||0)+p.comp;});
+  const sorted=Object.entries(teams).sort((a,b)=>b[1]-a[1]).slice(0,10);
+  new Chart(document.getElementById('teamBar'),{
+    type:'bar',
+    data:{labels:sorted.map(t=>t[0]),datasets:[{label:'Total DP Spend',data:sorted.map(t=>+(t[1]/1e6).toFixed(2)),backgroundColor:'#3b82f680',borderColor:'#3b82f6',borderWidth:1,borderRadius:{topRight:4,bottomRight:4}}]},
+    options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>'$'+ctx.parsed.x.toFixed(2)+'M'},backgroundColor:'#0a1628',borderColor:'#1e3a5f',borderWidth:1,titleColor:'#fff',bodyColor:'#9ca3af'}},
+      scales:{x:{ticks:{color:'#6b7280',callback:v=>'$'+v+'M'},grid:{color:'#1e3a5f'}},y:{ticks:{color:'#9ca3af'},grid:{display:false}}}}
+  });
+}
+
+function effColor(c){if(c<200000)return'#22c55e';if(c<400000)return'#a3e635';if(c<600000)return'#facc15';if(c<800000)return'#fb923c';return'#ef4444';}
+function fmtCost(c){return c>=1e6?'$'+(c/1e6).toFixed(2)+'M':'$'+(c/1000).toFixed(0)+'K';}
+
+function renderTable(){
+  const q=document.getElementById('player-search').value.toLowerCase().trim();
+  const sorted=[...data].sort((a,b)=>(a.costPerGA??Infinity)-(b.costPerGA??Infinity));
+  const filtered=q?sorted.filter(p=>p.player.toLowerCase().includes(q)||p.team.toLowerCase().includes(q)):sorted;
+  document.getElementById('player-count-badge').textContent=filtered.length+' '+(filtered.length===1?'Player':'Players');
+  document.getElementById('table-body').innerHTML=filtered.map(p=>`
+    <tr>
+      <td>${p.player}</td><td class="muted">${p.team}</td>
+      <td class="r">$${(p.comp/1e6).toFixed(2)}</td>
+      <td class="c">${p.ga}</td>
+      <td class="r"><span style="display:inline-flex;align-items:center;gap:6px;">${p.costPerGA!==null?fmtCost(p.costPerGA):'—'}<span class="eff-bar" style="background:${p.costPerGA!==null?effColor(p.costPerGA):'#374151'};"></span></span></td>
+    </tr>`).join('');
+}
+
+renderScatter1();
+renderScatter2();
+renderTeamBar();
+renderTable();
+</script>
