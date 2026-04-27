@@ -82,7 +82,7 @@ td.r { text-align: right; } td.c { text-align: center; } td.muted { color: #9ca3
     </div>
   </div>
 
-  <!-- Scatter 1: Salary vs G+A with regression -->
+  <!-- Scatter 1 -->
   <div class="panel">
     <div class="panel-header">
       <div>
@@ -110,7 +110,7 @@ td.r { text-align: right; } td.c { text-align: center; } td.muted { color: #9ca3
       <div class="leg-item" style="gap:8px;"><div style="width:24px;height:3px;background:#ffffff;border-radius:2px;"></div><span>Regression line</span></div>
     </div>
     <div style="height:380px;position:relative;">
-      <canvas id="scatter1" role="img" aria-label="Scatter chart of guaranteed compensation vs goals and assists contribution with regression line">MLS designated player salary vs goals and assists data with regression line.</canvas>
+      <canvas id="scatter1"></canvas>
     </div>
   </div>
 
@@ -119,7 +119,7 @@ td.r { text-align: right; } td.c { text-align: center; } td.muted { color: #9ca3
     <div class="panel">
       <div class="panel-title" style="margin-bottom:16px;font-size:15px;">Top Spending Teams on Designated Players</div>
       <div style="position:relative;width:100%;height:380px;">
-        <canvas id="teamBar" role="img" aria-label="Horizontal bar chart of top 10 MLS teams by DP spending">Top 10 MLS teams by designated player spending.</canvas>
+        <canvas id="teamBar"></canvas>
       </div>
     </div>
     <div class="panel">
@@ -170,7 +170,7 @@ td.r { text-align: right; } td.c { text-align: center; } td.muted { color: #9ca3
     </div>
   </div>
 
-  <!-- Scatter 2: Cost per G+A vs Compensation with regression -->
+  <!-- Scatter 2 -->
   <div class="panel">
     <div class="panel-header">
       <div>
@@ -194,10 +194,9 @@ td.r { text-align: right; } td.c { text-align: center; } td.muted { color: #9ca3
       <div class="leg-item" style="gap:8px;"><div style="width:24px;height:3px;background:#ffffff;border-radius:2px;"></div><span>Regression line</span></div>
     </div>
     <div style="height:460px;position:relative;">
-      <canvas id="scatter2" role="img" aria-label="Scatter chart of guaranteed compensation vs cost per goal plus assist contribution with regression line">MLS designated player salary vs cost per G+A with regression line.</canvas>
+      <canvas id="scatter2"></canvas>
     </div>
   </div>
-
 </div>
 
 <div class="tt" id="tt">
@@ -287,52 +286,56 @@ const RAW = [
 ];
 
 const data = RAW.map(r => {
-  const ga = r[5], comp = r[4];
-  const costPerGA = ga > 0 ? comp / ga : null;
-  return { player:r[0], team:r[1], goals:r[2], assists:r[3], comp, ga, cat:r[6], costPerGA };
+  const ga=r[5], comp=r[4];
+  const costPerGA = ga>0 ? comp/ga : null;
+  return {player:r[0],team:r[1],goals:r[2],assists:r[3],comp,ga,cat:r[6],costPerGA};
 });
 
-// Median cost per G+A for cost scatter categorization
-const validCosts = data.filter(p=>p.costPerGA!==null).map(p=>p.costPerGA).sort((a,b)=>a-b);
-const mid = Math.floor(validCosts.length/2);
-const medianCost = validCosts.length%2===0 ? (validCosts[mid-1]+validCosts[mid])/2 : validCosts[mid];
-const threshold = 100000;
-function costCat(p) {
-  if (p.costPerGA===null) return null;
-  if (p.costPerGA < medianCost-threshold) return 'Overperformed (Efficient)';
-  if (p.costPerGA > medianCost+threshold) return 'Underperformed (Inefficient)';
+const validCosts=data.filter(p=>p.costPerGA!==null).map(p=>p.costPerGA).sort((a,b)=>a-b);
+const mid=Math.floor(validCosts.length/2);
+const medianCost=validCosts.length%2===0?(validCosts[mid-1]+validCosts[mid])/2:validCosts[mid];
+const threshold=100000;
+function costCat(p){
+  if(p.costPerGA===null) return null;
+  if(p.costPerGA<medianCost-threshold) return 'Overperformed (Efficient)';
+  if(p.costPerGA>medianCost+threshold) return 'Underperformed (Inefficient)';
   return 'On Curve (Expected Cost)';
 }
 
-const COLORS = {
-  'Overperformed':'#10b981','On Curve':'#3b82f6','Underperformed':'#ef4444',
-  'Overperformed (Efficient)':'#10b981','On Curve (Expected Cost)':'#3b82f6','Underperformed (Inefficient)':'#ef4444'
-};
+const COLORS={'Overperformed':'#10b981','On Curve':'#3b82f6','Underperformed':'#ef4444',
+  'Overperformed (Efficient)':'#10b981','On Curve (Expected Cost)':'#3b82f6','Underperformed (Inefficient)':'#ef4444'};
 
-// Stats
-const totalComp = data.reduce((s,p)=>s+p.comp,0);
-const totalGoals = data.reduce((s,p)=>s+p.goals,0);
-const totalAssists = data.reduce((s,p)=>s+p.assists,0);
-const totalGA = totalGoals+totalAssists;
-const avgCost = totalGA>0 ? totalComp/totalGA : 0;
+const totalComp=data.reduce((s,p)=>s+p.comp,0);
+const totalGoals=data.reduce((s,p)=>s+p.goals,0);
+const totalAssists=data.reduce((s,p)=>s+p.assists,0);
+const totalGA=totalGoals+totalAssists;
+const avgCost=totalGA>0?totalComp/totalGA:0;
 document.getElementById('total-spend').textContent='$'+(totalComp/1e6).toFixed(2)+'M';
 document.getElementById('player-count-sub').textContent='Across '+data.length+' players';
 document.getElementById('avg-cost').textContent='$'+(avgCost/1000).toFixed(1)+'K';
 document.getElementById('total-ga').textContent=totalGA;
 document.getElementById('ga-breakdown').textContent=totalGoals+' goals, '+totalAssists+' assists';
 
-// Linear regression
-function linReg(pts) {
+function linReg(pts){
   const n=pts.length; let sx=0,sy=0,sxy=0,sxx=0;
   for(const p of pts){sx+=p.x;sy+=p.y;sxy+=p.x*p.y;sxx+=p.x*p.x;}
   const slope=(n*sxy-sx*sy)/(n*sxx-sx*sx);
   const intercept=(sy-slope*sx)/n;
   return {slope,intercept};
 }
+function buildRegDs(xArr,yArr){
+  const pts=xArr.map((x,i)=>({x,y:yArr[i]}));
+  const {slope,intercept}=linReg(pts);
+  const xMin=Math.min(...xArr),xMax=Math.max(...xArr);
+  return {label:'Regression line',data:[{x:xMin,y:slope*xMin+intercept},{x:xMax,y:slope*xMax+intercept}],
+    type:'line',borderColor:'#ffffff',borderWidth:3,pointRadius:0,fill:false,tension:0,order:0};
+}
 
-// Tooltip
+// Tooltip — the fix: track mouse position globally and hide when mouse leaves canvas
 const ttEl=document.getElementById('tt');
-function showTT(e,p,showCost) {
+let ttVisible=false;
+
+function showTT(x,y,p,showCost){
   document.getElementById('tt-player').textContent=p.player;
   document.getElementById('tt-team').textContent=p.team;
   document.getElementById('tt-salary').textContent='$'+(p.comp/1e6).toFixed(2)+'M';
@@ -345,36 +348,35 @@ function showTT(e,p,showCost) {
     document.getElementById('tt-cost').textContent=p.costPerGA>=1e6?'$'+(p.costPerGA/1e6).toFixed(2)+'M':'$'+(p.costPerGA/1000).toFixed(0)+'K';
   } else { costRow.style.display='none'; }
   const catLabel=showCost?costCat(p):p.cat;
-  const col=COLORS[catLabel]||'#9ca3af';
   document.getElementById('tt-cat').textContent=catLabel||'';
-  document.getElementById('tt-cat').style.color=col;
+  document.getElementById('tt-cat').style.color=COLORS[catLabel]||'#9ca3af';
+  ttEl.style.left=Math.min(x+14,window.innerWidth-210)+'px';
+  ttEl.style.top=(y-10)+'px';
   ttEl.style.display='block';
-  ttEl.style.left=Math.min(e.clientX+14,window.innerWidth-210)+'px';
-  ttEl.style.top=(e.clientY-10)+'px';
+  ttVisible=true;
 }
-function hideTT(){ttEl.style.display='none';}
+function hideTT(){
+  ttEl.style.display='none';
+  ttVisible=false;
+}
+
+// Attach mouseleave to each canvas to guarantee tooltip hides
+function attachLeave(canvasId){
+  document.getElementById(canvasId).addEventListener('mouseleave',()=>hideTT());
+}
 
 function makeTTPlugin(showCost){
   return {
     enabled:false,
     external:({chart,tooltip})=>{
-      if(!tooltip||!tooltip.dataPoints||!tooltip.dataPoints.length){hideTT();return;}
+      if(!tooltip||tooltip.opacity===0||!tooltip.dataPoints||!tooltip.dataPoints.length){
+        hideTT(); return;
+      }
       const raw=tooltip.dataPoints[0].raw;
       if(!raw||!raw.player){hideTT();return;}
       const r=chart.canvas.getBoundingClientRect();
-      showTT({clientX:r.left+tooltip.caretX,clientY:r.top+tooltip.caretY},raw,showCost);
+      showTT(r.left+tooltip.caretX, r.top+tooltip.caretY, raw, showCost);
     }
-  };
-}
-
-function buildRegDs(xArr, yArr) {
-  const pts=xArr.map((x,i)=>({x,y:yArr[i]}));
-  const {slope,intercept}=linReg(pts);
-  const xMin=Math.min(...xArr), xMax=Math.max(...xArr);
-  return {
-    label:'Regression line',
-    data:[{x:xMin,y:slope*xMin+intercept},{x:xMax,y:slope*xMax+intercept}],
-    type:'line',borderColor:'#ffffff',borderWidth:3,pointRadius:0,fill:false,tension:0,order:0
   };
 }
 
@@ -389,20 +391,17 @@ function renderScatter1(){
       .map(p=>({...p,x:p.comp/1e6,y:p.ga}));
     return {label:cat,data:pts,backgroundColor:COLORS[cat]+'cc',borderColor:COLORS[cat],borderWidth:1,pointRadius:5,pointHoverRadius:7};
   }).filter(ds=>ds.data.length>0);
-
   const regDs=buildRegDs(data.map(p=>p.comp/1e6),data.map(p=>p.ga));
-
   c1=new Chart(document.getElementById('scatter1'),{
     type:'scatter',data:{datasets:[...scatterDs,regDs]},
-    options:{
-      responsive:true,maintainAspectRatio:false,animation:false,
+    options:{responsive:true,maintainAspectRatio:false,animation:false,
       plugins:{legend:{display:false},tooltip:makeTTPlugin(false)},
       scales:{
         x:{title:{display:true,text:'Guaranteed Compensation ($M)',color:'#9ca3af'},ticks:{color:'#6b7280',callback:v=>'$'+v.toFixed(1)+'M'},grid:{color:'#00000000'}},
         y:{title:{display:true,text:'Goals + Assists',color:'#9ca3af'},ticks:{color:'#6b7280'},grid:{color:'#00000000'}}
-      }
-    }
+      }}
   });
+  attachLeave('scatter1');
 }
 
 function renderScatter2(){
@@ -415,20 +414,17 @@ function renderScatter2(){
       .map(p=>({...p,x:p.comp,y:p.costPerGA}));
     return {label:cat,data:pts,backgroundColor:COLORS[cat]+'cc',borderColor:COLORS[cat],borderWidth:1,pointRadius:5,pointHoverRadius:7};
   }).filter(ds=>ds.data.length>0);
-
   const regDs=buildRegDs(validData.map(p=>p.comp),validData.map(p=>p.costPerGA));
-
   c2=new Chart(document.getElementById('scatter2'),{
     type:'scatter',data:{datasets:[...scatterDs,regDs]},
-    options:{
-      responsive:true,maintainAspectRatio:false,animation:false,
+    options:{responsive:true,maintainAspectRatio:false,animation:false,
       plugins:{legend:{display:false},tooltip:makeTTPlugin(true)},
       scales:{
         x:{title:{display:true,text:'Guaranteed Compensation ($)',color:'#9ca3af'},ticks:{color:'#6b7280',callback:v=>v>=1e6?'$'+(v/1e6).toFixed(0)+'M':'$'+(v/1000).toFixed(0)+'K'},grid:{color:'#00000000'}},
         y:{title:{display:true,text:'Cost per Goal + Assist Contribution ($)',color:'#9ca3af'},ticks:{color:'#6b7280',callback:v=>v>=1e6?'$'+(v/1e6).toFixed(2)+'M':'$'+(v/1000).toFixed(0)+'K'},grid:{color:'#00000000'}}
-      }
-    }
+      }}
   });
+  attachLeave('scatter2');
 }
 
 function renderTeamBar(){
